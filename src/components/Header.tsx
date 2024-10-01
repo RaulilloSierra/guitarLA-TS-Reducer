@@ -1,25 +1,18 @@
-import { Fragment } from "react";
-import type { CartItem, GuitarId } from "../types";
+import { Fragment, useMemo, Dispatch } from "react";
+import type { CartItem } from "../types";
+import { CartActions } from "../reducers/cartReducer.ts";
 
 interface HeaderProps {
   cart: CartItem[];
-  deleteFromCart: (id: GuitarId) => void;
-  increaseQuantity: (id: GuitarId) => void;
-  reduceQuantity: (id: GuitarId) => void;
-  clearCart: () => void;
-  isEmpty: boolean;
-  cartTotal: number;
+  dispatch: Dispatch<CartActions>;
 }
 
-export default function Header({
-  cart,
-  deleteFromCart,
-  increaseQuantity,
-  reduceQuantity,
-  clearCart,
-  isEmpty,
-  cartTotal,
-}: HeaderProps) {
+export default function Header({ cart, dispatch }: HeaderProps) {
+  const isEmpty = useMemo(() => cart.length === 0, [cart]);
+  const cartTotal = useMemo(
+    () => cart.reduce((total, item) => total + item.quantity * item.price, 0),
+    [cart]
+  );
   return (
     <Fragment>
       <header className="py-5 header">
@@ -74,7 +67,12 @@ export default function Header({
                                   <button
                                     type="button"
                                     className="btn btn-dark"
-                                    onClick={() => reduceQuantity(guitar.id)}
+                                    onClick={() =>
+                                      dispatch({
+                                        type: "reduceQuantity",
+                                        payload: { id: guitar.id },
+                                      })
+                                    }
                                   >
                                     -
                                   </button>
@@ -82,7 +80,12 @@ export default function Header({
                                   <button
                                     type="button"
                                     className="btn btn-dark"
-                                    onClick={() => increaseQuantity(guitar.id)}
+                                    onClick={() =>
+                                      dispatch({
+                                        type: "increaseQuantity",
+                                        payload: { id: guitar.id },
+                                      })
+                                    }
                                   >
                                     +
                                   </button>
@@ -91,7 +94,12 @@ export default function Header({
                                   <button
                                     className="btn btn-danger"
                                     type="button"
-                                    onClick={() => deleteFromCart(guitar.id)}
+                                    onClick={() =>
+                                      dispatch({
+                                        type: "deleteFromCart",
+                                        payload: { id: guitar.id },
+                                      })
+                                    }
                                   >
                                     X
                                   </button>
@@ -110,7 +118,7 @@ export default function Header({
 
                   <button
                     className="btn btn-dark w-100 mt-3 p-2"
-                    onClick={clearCart}
+                    onClick={() => dispatch({ type: "clearCart" })}
                   >
                     Vaciar Carrito
                   </button>

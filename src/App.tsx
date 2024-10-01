@@ -1,38 +1,24 @@
-import { Fragment } from "react";
+import { Fragment, useReducer } from "react";
 import Header from "./components/Header.js";
 import Guitar from "./components/Guitar.js";
-import useCart from "./hooks/useCart.js";
+import { cartReducer, initialState } from "./reducers/cartReducer.ts";
 
 function App() {
-  const {
-    data,
-    cart,
-    addToCart,
-    deleteFromCart,
-    increaseQuantity,
-    reduceQuantity,
-    clearCart,
-    isEmpty,
-    cartTotal,
-  } = useCart();
+
+  const [state, dispatch] = useReducer(cartReducer, initialState);
 
   return (
     <Fragment>
       <Header
-        cart={cart}
-        deleteFromCart={deleteFromCart}
-        increaseQuantity={increaseQuantity}
-        reduceQuantity={reduceQuantity}
-        clearCart={clearCart}
-        isEmpty={isEmpty}
-        cartTotal={cartTotal}
+        cart={state.cart}
+        dispatch={dispatch}
       />
       <main className="container-xl mt-5">
         <h2 className="text-center">Nuestra Colección</h2>
 
         <div className="row mt-5">
-          {data.map((g) => {
-            return <Guitar key={g.id} guitar={g} addToCart={addToCart} />;
+          {state.data?.map((g) => {
+            return <Guitar key={g.id} guitar={g} dispatch={dispatch} />;
           })}
         </div>
       </main>
